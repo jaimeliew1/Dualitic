@@ -4,10 +4,38 @@ from scipy import special, integrate, interpolate
 REGISTERED_DUAL_UFUNCS = {}
 
 
+def DualVariables(variables):
+    """
+    Constructs dual variables from a list of primal variables.
+
+    For each primal variable, creates a corresponding dual variable
+    with the dual component set to 1 at the index matching the
+    primal variable's position in the input list. All other dual
+    components are set to 0.
+
+    Args:
+        variables (list): List of primal variables
+
+    Returns:
+        list: List of DualNumber objects
+    """
+    variables = list(variables)
+    N = len(variables)
+
+    out = []
+    for i, variable in enumerate(variables):
+        dual = np.zeros(N)
+        dual[i] = 1
+        out.append(DualNumber(variable, dual))
+    return out
+
+
 class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
     def __init__(self, real, dual):
         self.real = np.atleast_1d(real)
         self.dual = np.atleast_2d(dual)
+        if isinstance(self.real[0], DualNumber):
+            breakpoint()
 
     def __repr__(self):
         return f"DualNumber({self.real}, {self.dual})"
@@ -278,6 +306,18 @@ def _(x):
 
 
 ### Monkey patching
+
+_squeeze = np.squeeze
+
+
+def squeeze_override(x, axis=None, **kwargs):
+    if isinstance(x, DualNumber):
+        return DualNumber(np.squeeze(x.real, -1), np.squeeze(x.dual, -2))
+    else:
+        return _squeeze(x, axis=axis, **kwargs)
+
+
+np.squeeze = squeeze_override
 
 # Monkey patch cumtrapz
 _cumtrapz = integrate.cumtrapz
