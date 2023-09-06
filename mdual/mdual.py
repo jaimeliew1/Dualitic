@@ -238,6 +238,23 @@ def _(x):
     return DualNumber(np.sin(x.real), x.dual * np.cos(x.real[..., None]))
 
 
+@register_dual_ufunc(np.arctan2)
+def _(x, y):
+    if isinstance(x, DualNumber):
+        xr, xd = x.real, x.dual
+    else:
+        xr, xd = x, np.zeros_like(x)[..., None]
+    if isinstance(y, DualNumber):
+        yr, yd = y.real, y.dual
+    else:
+        yr, yd = y, np.zeros_like(y)[..., None]
+    real = np.arctan2(xr, yr)
+    dual = (xd * yr[..., None] - xr[..., None] * yd) / (
+        xr[..., None] ** 2 + yr[..., None] ** 2
+    )
+    return DualNumber(real, dual)
+
+
 @register_dual_ufunc(np.sqrt)
 def _(x):
     real = np.sqrt(x.real)
@@ -280,6 +297,7 @@ def _(x, axis=None, **kwargs):
 
 
 @register_dual_ufunc(np.maximum)
+# REWRITE AND ADD MINIMUM AND  CLIP (to be monkey patched)
 def _(x, axis=None, **kwargs):
     return DualNumber(np.max(x.real, axis=axis, **kwargs), np.zeros_like(x.dual))
 
@@ -307,6 +325,7 @@ def _(x):
 
 ### Monkey patching
 
+# Monkey patch np.squeeze
 _squeeze = np.squeeze
 
 
@@ -318,6 +337,23 @@ def squeeze_override(x, axis=None, **kwargs):
 
 
 np.squeeze = squeeze_override
+
+# Monkey patch np.trapz
+_trapz = np.trapz
+
+
+def trapz_override(y, x=None, axis=-1, **kwargs):
+    if isinstance(y, DualNumber):
+        real = _trapz(y.real, x=x, axis=axis, **kwargs)
+        if axis < 0:
+            axis -= 1
+        dual = _trapz(y.dual, x=x[..., None], axis=axis, **kwargs)
+        return DualNumber(real, dual)
+    else:
+        return _trapz(y, x=x, axis=axis, **kwargs)
+
+
+np.trapz = trapz_override
 
 # Monkey patch cumtrapz
 _cumtrapz = integrate.cumtrapz
