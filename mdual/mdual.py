@@ -296,15 +296,33 @@ def _(x, axis=None, **kwargs):
     return DualNumber(np.max(x.real, axis=axis, **kwargs), np.zeros_like(x.dual))
 
 
-@register_dual_ufunc(np.maximum)
-# REWRITE AND ADD MINIMUM AND  CLIP (to be monkey patched)
-def _(x, axis=None, **kwargs):
-    return DualNumber(np.max(x.real, axis=axis, **kwargs), np.zeros_like(x.dual))
-
-
 @register_dual_ufunc(np.min)
 def _(x, axis=None, **kwargs):
     return DualNumber(np.min(x.real, axis=axis, **kwargs), np.zeros_like(x.dual))
+
+
+@register_dual_ufunc(np.maximum)
+def _(a, b, *args, **kwargs):
+    assert isinstance(a, DualNumber)
+    assert isinstance(b, float) or isinstance(b, int)
+    indices = np.where(a.real > b)
+
+    out = a
+    out.real[indices] = b
+    out.dual[indices] = 0
+    return out
+
+
+@register_dual_ufunc(np.minimum)
+def _(a, b, *args, **kwargs):
+    assert isinstance(a, DualNumber)
+    assert isinstance(b, float) or isinstance(b, int)
+    indices = np.where(a.real < b)
+
+    out = a
+    out.real[indices] = b
+    out.dual[indices] = 0
+    return out
 
 
 @register_dual_ufunc(np.deg2rad)
@@ -324,6 +342,19 @@ def _(x):
 
 
 ### Monkey patching
+
+# Monkey patch np.clip
+_clip = np.clip
+
+
+def clip_override(x, a, b, **kwargs):
+    if isinstance(x, DualNumber):
+        return np.minimum(np.maximum(x, a), b)
+    else:
+        return _clip(x, a, b, **kwargs)
+
+
+np.clip = clip_override
 
 # Monkey patch np.squeeze
 _squeeze = np.squeeze
