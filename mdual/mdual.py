@@ -255,6 +255,14 @@ def _(x, y):
     return DualNumber(real, dual)
 
 
+@register_dual_ufunc(np.arctan)
+def _(x):
+    real = np.arctan(x.real)
+    dual = x.dual / (1 + x.real[..., None] ** 2)
+
+    return DualNumber(real, dual)
+
+
 @register_dual_ufunc(np.sqrt)
 def _(x):
     real = np.sqrt(x.real)
@@ -289,6 +297,17 @@ def _(x, axis=None, **kwargs):
     return DualNumber(
         np.mean(x.real, axis=axis, **kwargs), np.mean(x.dual, axis=axis, **kwargs)
     )
+
+
+@register_dual_ufunc(np.greater_equal)
+def _(x1, x2, *args, **kwargs):
+    if isinstance(x1, DualNumber):
+        x1 = x1.real
+
+    if isinstance(x2, DualNumber):
+        x2 = x2.real
+
+    return np.greater_equal(x1, x2, *args, **kwargs)
 
 
 @register_dual_ufunc(np.max)
