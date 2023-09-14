@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "mdual"
+name = "dualitic"
 version = "0.1.0"
 description = ""
 authors = ["Jaime Liew <jaimeliew1@gmail.com>"]
-# readme = "README.md"
-# packages = [{ include = "mdual" }]
+readme = "README.md"
+packages = [{ include = "dualitic" }]
 
 [tool.poetry.dependencies]
 python = ">=3.8, <=3.9"
@@ -17,7 +17,7 @@ typing-extensions = "^4.6.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
-black = "^23.3.0"
+black = {extras = ["jupyter"], version = "^23.9.1"}
 ipython = ">=7.23.1"
 ipykernel = "^6.25.1"
 snakeviz = "^2.2.0"
