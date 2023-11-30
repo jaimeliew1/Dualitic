@@ -215,7 +215,7 @@ def _(self, other):
 
 @register_dual_ufunc(np.true_divide)
 def _(self, other):
-    if isinstance(self, np.ndarray):
+    if isinstance(self, np.ndarray) or isinstance(self, np.float64):
         real = self / other.real
         dual = -self[..., None] * other.dual / (other.real[..., None] ** 2)
         return DualNumber(real, dual)
@@ -352,6 +352,11 @@ def _(x, axis=None, **kwargs):
 @register_dual_ufunc(np.rad2deg)
 def _(x, axis=None, **kwargs):
     return DualNumber(np.rad2deg(x.real), np.rad2deg(x.dual))
+
+
+@register_dual_ufunc(np.isnan)
+def _(x, *args, **kwargs):
+    return np.isnan(x.real, *args, **kwargs)
 
 
 @register_dual_ufunc(special.erf)
