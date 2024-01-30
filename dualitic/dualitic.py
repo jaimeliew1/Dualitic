@@ -273,6 +273,14 @@ def _(x):
     return DualNumber(real, dual)
 
 
+@register_dual_ufunc(np.arccos)
+def _(x):
+    real = np.arccos(x.real)
+    dual = -x.dual / np.sqrt(1 - x.real[..., None] ** 2)
+
+    return DualNumber(real, dual)
+
+
 @register_dual_ufunc(np.sqrt)
 def _(x):
     real = np.sqrt(x.real)
