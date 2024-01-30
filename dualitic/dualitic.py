@@ -446,3 +446,32 @@ def interp1d_override(x, y, *args, axis=-1, **kwargs):
 
 
 interpolate.interp1d = interp1d_override
+
+# Monkey patch scipy.interpolate.RectBivariateSpline
+
+_RectBivariateSpline = interpolate.RectBivariateSpline
+
+
+class RectBivariateSpline_override(_RectBivariateSpline):
+    """
+    Dual-number compatible RectBivariateSpline. Currently interpolates only real
+    values onto a dual number-based interpolation grid.
+
+    """
+
+    def __init__(self, x, y, z, bbox=[None] * 4, kx=3, ky=3, s=0):
+        return super().__init__(x, y, z, bbox=bbox, kx=kx, ky=ky, s=s)
+
+    def __call__(self, x, y, dx=0, dy=0, grid=True):
+        if all(not isinstance(_x, DualNumber) for _x in (x, y)):
+            return super().__call__(x, y, dx, dy, grid)
+        else:
+            primal = self(x.real, y.real, dx=dx, dy=dy, grid=grid)
+            dual = (
+                x.dual * self(x.real, y.real, dx=dx + 1, dy=dy, grid=grid)[..., None]
+                + y.dual * self(x.real, y.real, dx=dx, dy=dy + 1, grid=grid)[..., None]
+            )
+            return DualNumber(primal, dual)
+
+
+interpolate.RectBivariateSpline = RectBivariateSpline_override
