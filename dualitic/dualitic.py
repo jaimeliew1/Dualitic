@@ -398,6 +398,23 @@ def clip_override(x, a, b, **kwargs):
 
 np.clip = clip_override
 
+# Monkey patch np.expand_dims
+_expand_dims = np.expand_dims
+
+
+def expand_dims_override(a, axis):
+    if isinstance(a, DualNumber):
+        real = _expand_dims(a.real, axis)
+        if axis < 0:
+            axis -= 1
+        dual = _expand_dims(a.dual, axis)
+        return DualNumber(real, dual)
+    else:
+        return _expand_dims(a, axis)
+
+
+np.expand_dims = expand_dims_override
+
 # Monkey patch np.squeeze
 _squeeze = np.squeeze
 
