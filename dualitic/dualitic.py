@@ -342,7 +342,7 @@ def _(x, axis=None, **kwargs):
 def _(a, b, *args, **kwargs):
     assert isinstance(a, DualNumber)
     assert isinstance(b, float) or isinstance(b, int)
-    indices = np.where(a.real > b)
+    indices = np.where(a.real < b)
 
     out = a
     out.real[indices] = b
@@ -354,7 +354,7 @@ def _(a, b, *args, **kwargs):
 def _(a, b, *args, **kwargs):
     assert isinstance(a, DualNumber)
     assert isinstance(b, float) or isinstance(b, int)
-    indices = np.where(a.real < b)
+    indices = np.where(a.real > b)
 
     out = a
     out.real[indices] = b
