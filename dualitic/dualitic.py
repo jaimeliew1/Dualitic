@@ -502,9 +502,11 @@ class RectBivariateSpline_override(_RectBivariateSpline):
             return super().__call__(x, y, dx, dy, grid)
         else:
             primal = self(x.real, y.real, dx=dx, dy=dy, grid=grid)
+            x_dual = x.dual if isinstance(x, DualNumber) else 0.0
+            y_dual = y.dual if isinstance(y, DualNumber) else 0.0
             dual = (
-                x.dual * self(x.real, y.real, dx=dx + 1, dy=dy, grid=grid)[..., None]
-                + y.dual * self(x.real, y.real, dx=dx, dy=dy + 1, grid=grid)[..., None]
+                x_dual * self(x.real, y.real, dx=dx + 1, dy=dy, grid=grid)[..., None]
+                + y_dual * self(x.real, y.real, dx=dx, dy=dy + 1, grid=grid)[..., None]
             )
             return DualNumber(primal, dual)
 
