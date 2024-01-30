@@ -30,6 +30,16 @@ def DualVariables(variables):
     return out
 
 
+def undual(x):
+    """
+    'unduals' a number returning the real part if the number is a DualNumber, or
+    just returns the value again if it is not.
+    """
+    if isinstance(x, DualNumber):
+        return x.real[0]
+    return x
+
+
 class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
     def __init__(self, real, dual):
         self.real = np.atleast_1d(real)
