@@ -2,6 +2,7 @@ import numpy as np
 from scipy import special, integrate, interpolate
 
 REGISTERED_DUAL_UFUNCS = {}
+MONKEY_PATCHED = []
 
 
 def DualVariables(variables):
@@ -44,11 +45,19 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
     def __init__(self, real, dual):
         self.real = np.atleast_1d(real)
         self.dual = np.atleast_2d(dual)
+
         if isinstance(self.real[0], DualNumber):
             breakpoint()
 
+    @property
+    def degree(self):
+        """
+        Returns the degree of the dual number. i.e. the number of dual variables.
+        """
+        return len(self.dual[-1])
+
     def __repr__(self):
-        return f"DualNumber({self.real}, {self.dual})"
+        return f"DualNumber(degree={self.degree}, {self.real}, {self.dual})"
 
     def __iter__(self):
         return (DualNumber(r, d) for r, d in zip(self.real, self.dual))
@@ -203,6 +212,20 @@ def register_dual_ufunc(ufunc):
     return decorator
 
 
+def monkey_patch(to_override):
+    MONKEY_PATCHED.append(to_override)
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        wrapper.to_override = to_override
+
+        return wrapper
+
+    return decorator
+
+
 @register_dual_ufunc(np.absolute)
 def _(self):
     return abs(self)
@@ -294,6 +317,24 @@ def _(x):
     return DualNumber(real, x.dual * real[..., None])
 
 
+@register_dual_ufunc(np.power)
+def _(x1, x2):
+    degree = x1.degree if isinstance(x1, DualNumber) else x2.degree
+    if isinstance(x1, DualNumber):
+        x1_real, x1_dual = x1.real, x1.dual
+    else:
+        x1_real, x1_dual = x1, np.zeros((*x1.shape, degree))
+
+    if isinstance(x2, DualNumber):
+        x2_real, x2_dual = x2.real, x2.dual
+    else:
+        x2_real, x2_dual = x2, np.zeros((*x2.shape, degree))
+
+    real = x1_real**x2_real
+    dual = real[..., None] * (x1_dual * x2_real[..., None] / x1_real[..., None] + x2_dual * np.log(x1_real[..., None]))
+    return DualNumber(real, dual)
+
+
 @register_dual_ufunc(np.log)
 def _(x):
     return DualNumber(np.exp(x.real), x.dual / x.real[..., None])
@@ -375,6 +416,12 @@ def _(x, axis=None, **kwargs):
 @register_dual_ufunc(np.isnan)
 def _(x, *args, **kwargs):
     return np.isnan(x.real, *args, **kwargs)
+
+
+@register_dual_ufunc(np.nanmax)
+def _(x, *args, **kwargs):
+    breakpoint()
+    return np.nanmax(x.real, *args, **kwargs)
 
 
 @register_dual_ufunc(special.erf)
