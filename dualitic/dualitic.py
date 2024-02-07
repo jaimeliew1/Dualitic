@@ -62,6 +62,12 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
     def __iter__(self):
         return (DualNumber(r, d) for r, d in zip(self.real, self.dual))
 
+    def __getitem__(self, index):
+        if isinstance(index, tuple):
+            return DualNumber(self.real[index], self.dual[(*index, slice(None))])
+        else:
+            return DualNumber(self.real[index], self.dual[(index, slice(None))])
+
     def __add__(self, other):
         if isinstance(other, DualNumber):
             real = self.real + other.real
