@@ -343,7 +343,7 @@ def _(x1, x2):
 
 @register_dual_ufunc(np.log)
 def _(x):
-    return DualNumber(np.exp(x.real), x.dual / x.real[..., None])
+    return DualNumber(np.log(x.real), x.dual / x.real[..., None])
 
 
 @register_dual_ufunc(np.sum)
