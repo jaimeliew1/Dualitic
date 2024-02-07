@@ -152,6 +152,19 @@ class TestDualVec:
         assert np.array_equal(out.real, np.array([1, 1, 1, 1]))
         assert np.array_equal(out.dual, -np.array([[1, 1], [1, 1], [1, 1], [1, 1]]))
 
+    def test_log_vec_self_consistent(self):
+        theta = DualNumber(1, [[1.0]])
+        xp = np.linspace(0, 10, 100) * theta
+
+        assert np.array_equal(np.log(xp).real, np.log(xp.real))
+
+    def test_erf_vec_self_consistent(self):
+        from scipy.special import erf
+
+        theta = DualNumber(1, [[1.0]])
+        xp = np.linspace(0, 10, 100) * theta
+        assert np.array_equal(erf(xp).real, erf(xp.real))
+
 
 def sample_function(x, y):
     return x * np.exp(-(x**2) - y**2)
