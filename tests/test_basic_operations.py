@@ -190,3 +190,133 @@ class TestMonkeyPatch:
         assert np.array_equal(values_interp_dual.real, values_interp)
         assert np.array_equal(values_interp_dual.dual[..., 0], values_interp_dx)
         assert np.array_equal(values_interp_dual.dual[..., 1], values_interp_dy)
+
+
+class TestInterp:
+    def test_interp_1(self):
+        # test set 1: x, xp, and yp are all dual variables
+        xp =  DualNumber([1.1, 2.0], [[1,0,0,0,0], [0,1,0,0,0]])
+        yp =  DualNumber([1.0, 3.0], [[0,0,1,0,0], [0,0,0,1,0]])
+        x = DualNumber([1.5], [[0,0,0,0,1]])
+
+        y_test1 = np.interp(x, xp, yp)
+
+        x1_fd = 1.1
+        y1_fd = 1
+        x2_fd = 2
+        y2_fd = 3
+        x_fd = 1.5
+
+        delta = 0.05
+        dydx_fd = (np.interp(x_fd + delta, [x1_fd,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd - delta, [x1_fd,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxl_fd = (np.interp(x_fd, [x1_fd + delta ,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd - delta ,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxr_fd = (np.interp(x_fd, [x1_fd,x2_fd + delta], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd - delta], [y1_fd, y2_fd])) / (2*delta)
+        dydyl_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd + delta, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd - delta, y2_fd])) / (2*delta)
+        dydyr_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd + delta]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd - delta])) / (2*delta)
+
+        assert np.abs(y_test1.dual[0,0] - dydxl_fd) < 0.01
+        assert np.abs(y_test1.dual[0,1] - dydxr_fd) < 0.01
+        assert np.abs(y_test1.dual[0,2] - dydyl_fd) < 0.01
+        assert np.abs(y_test1.dual[0,3] - dydyr_fd) < 0.01
+        assert np.abs(y_test1.dual[0,4] - dydx_fd) < 0.01
+        assert np.abs(y_test1.real[0] - np.interp(x_fd, [x1_fd, x2_fd],
+                                                    [y1_fd, y2_fd])) < 0.01
+
+    def test_interp_2(self):
+        # test set 2: x is not a dual number while xp and yp are dual numbers
+        xp =  DualNumber([1.1, 2.0], [[1,0,0,0,0], [0,1,0,0,0]])
+        yp =  DualNumber([1.0, 3.0], [[0,0,1,0,0], [0,0,0,1,0]])
+        x = 1.5
+
+        y_test2 = np.interp(x, xp, yp)
+
+        x1_fd = 1.1
+        y1_fd = 1
+        x2_fd = 2
+        y2_fd = 3
+        x_fd = 1.5
+
+        delta = 0.05
+        dydx_fd = (np.interp(x_fd + delta, [x1_fd,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd - delta, [x1_fd,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxl_fd = (np.interp(x_fd, [x1_fd + delta ,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd - delta ,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxr_fd = (np.interp(x_fd, [x1_fd,x2_fd + delta], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd - delta], [y1_fd, y2_fd])) / (2*delta)
+        dydyl_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd + delta, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd - delta, y2_fd])) / (2*delta)
+        dydyr_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd + delta]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd - delta])) / (2*delta)
+
+        assert np.abs(y_test2.dual[0,0] - dydxl_fd) < 0.01
+        assert np.abs(y_test2.dual[0,1] - dydxr_fd) < 0.01
+        assert np.abs(y_test2.dual[0,2] - dydyl_fd) < 0.01
+        assert np.abs(y_test2.dual[0,3] - dydyr_fd) < 0.01
+        assert np.abs(y_test2.real[0] - np.interp(x_fd, [x1_fd, x2_fd],
+                                                    [y1_fd, y2_fd])) < 0.01
+
+    def test_interp_3(self):
+        # test set 3: xp is not a dual number but x and yp are
+        xp =  [1.1, 2.0]
+        yp =  DualNumber([1.0, 3.0], [[1,0,0], [0,1,0]])
+        x = DualNumber([1.5], [[0,0,1]])
+
+        y_test3 = np.interp(x, xp, yp)
+
+        x1_fd = 1.1
+        y1_fd = 1
+        x2_fd = 2
+        y2_fd = 3
+        x_fd = 1.5
+
+        delta = 0.05
+        dydx_fd = (np.interp(x_fd + delta, [x1_fd,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd - delta, [x1_fd,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydyl_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd + delta, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd - delta, y2_fd])) / (2*delta)
+        dydyr_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd + delta]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd - delta])) / (2*delta)
+
+        assert np.abs(y_test3.dual[0,0] - dydyl_fd) < 0.01
+        assert np.abs(y_test3.dual[0,1] - dydyr_fd) < 0.01
+        assert np.abs(y_test3.dual[0,2] - dydx_fd) < 0.01
+        assert np.abs(y_test3.real[0] - np.interp(x_fd, [x1_fd, x2_fd],
+                                            [y1_fd, y2_fd])) < 0.01
+
+    def test_interp_4(self):
+        # test set 4: yp is not a dual number but x and xp are
+        xp =  DualNumber([1.1, 2.0], [[1,0,0], [0,1,0]])
+        yp =  [1.0, 3.0]
+        x = DualNumber([1.5], [[0,0,1]])
+
+        y_test4 = np.interp(x, xp, yp)
+
+        x1_fd = 1.1
+        y1_fd = 1
+        x2_fd = 2
+        y2_fd = 3
+        x_fd = 1.5
+
+        delta = 0.05
+        dydx_fd = (np.interp(x_fd + delta, [x1_fd,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd - delta, [x1_fd,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxl_fd = (np.interp(x_fd, [x1_fd + delta ,x2_fd], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd - delta ,x2_fd], [y1_fd, y2_fd])) / (2*delta)
+        dydxr_fd = (np.interp(x_fd, [x1_fd,x2_fd + delta], [y1_fd, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd - delta], [y1_fd, y2_fd])) / (2*delta)
+        dydyl_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd + delta, y2_fd]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd - delta, y2_fd])) / (2*delta)
+        dydyr_fd = (np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd + delta]) - 
+                np.interp(x_fd, [x1_fd,x2_fd], [y1_fd, y2_fd - delta])) / (2*delta)
+
+        assert np.abs(y_test4.dual[0,0] - dydxl_fd) < 0.01
+        assert np.abs(y_test4.dual[0,1] - dydxr_fd) < 0.01
+        assert np.abs(y_test4.dual[0,2] - dydx_fd) < 0.01
+        assert np.abs(y_test4.real[0] - np.interp(x_fd, [x1_fd, x2_fd],
+                                                    [y1_fd, y2_fd])) < 0.01
+
