@@ -455,17 +455,8 @@ def interp_override(x, xp, yp, *args, **kwargs):
     else:
         idx = np.searchsorted(xp, x_real) - 1
     
-    if isinstance(xp, DualNumber):
-        x_l = DualNumber(xp.real[idx], xp.dual[idx])
-        x_r = DualNumber(xp.real[idx + 1], xp.dual[idx + 1])
-    else:
-        x_l, x_r = xp[idx], xp[idx + 1]
-    
-    if isinstance(yp, DualNumber):
-        y_l = DualNumber(yp.real[idx], yp.dual[idx])
-        y_r = DualNumber(yp.real[idx + 1], yp.dual[idx + 1])
-    else:
-        y_l, y_r = yp[idx], yp[idx + 1]
+    x_l, x_r = xp[idx], xp[idx + 1]
+    y_l, y_r = yp[idx], yp[idx + 1]
 
     return ((y_r - y_l) / (x_r - x_l)) * (x - x_l) + y_l
 
