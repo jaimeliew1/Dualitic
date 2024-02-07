@@ -433,7 +433,7 @@ def _(x, *args, **kwargs):
 @register_dual_ufunc(special.erf)
 def _(x):
     real = special.erf(x.real)
-    return DualNumber(real, 2 * x.dual / np.sqrt(2) * np.exp(-real[..., None] ** 2))
+    return DualNumber(real, (2 * x.dual / np.sqrt(np.pi)) * np.exp(-(x.real[..., None] ** 2)))
 
 
 ### Monkey patching
