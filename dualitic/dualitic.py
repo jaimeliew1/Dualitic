@@ -343,7 +343,7 @@ def _(x1, x2):
 
 @register_dual_ufunc(np.log)
 def _(x):
-    return DualNumber(np.exp(x.real), x.dual / x.real[..., None])
+    return DualNumber(np.log(x.real), x.dual / x.real[..., None])
 
 
 @register_dual_ufunc(np.sum)
@@ -433,10 +433,34 @@ def _(x, *args, **kwargs):
 @register_dual_ufunc(special.erf)
 def _(x):
     real = special.erf(x.real)
-    return DualNumber(real, 2 * x.dual / np.sqrt(2) * np.exp(-real[..., None] ** 2))
+    return DualNumber(real, (2 * x.dual / np.sqrt(np.pi)) * np.exp(-(x.real[..., None] ** 2)))
 
 
 ### Monkey patching
+
+_interp = np.interp
+
+# Monkey patch np.interp
+def interp_override(x, xp, yp, *args, **kwargs):
+    if not any(isinstance(arg, DualNumber) for arg in [x, xp, yp]):
+        return _interp(x, xp, yp, *args, **kwargs) 
+        
+    if isinstance(x, DualNumber):
+        x_real = x.real[0]
+    else:
+        x_real = x
+
+    if isinstance(xp, DualNumber):
+        idx = np.searchsorted(xp.real, x_real) - 1
+    else:
+        idx = np.searchsorted(xp, x_real) - 1
+    
+    x_l, x_r = xp[idx], xp[idx + 1]
+    y_l, y_r = yp[idx], yp[idx + 1]
+
+    return ((y_r - y_l) / (x_r - x_l)) * (x - x_l) + y_l
+
+np.interp = interp_override
 
 # Monkey patch np.clip
 _clip = np.clip
