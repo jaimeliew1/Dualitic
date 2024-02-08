@@ -2,6 +2,7 @@ from dualitic import DualNumber
 import numpy as np
 
 
+
 class TestDualDual:
     def test_add_scalar(self):
         a = DualNumber(1, 2)
@@ -165,6 +166,29 @@ class TestDualVec:
         xp = np.linspace(0, 10, 100) * theta
         assert np.array_equal(erf(xp).real, erf(xp.real))
 
+    def test_erf_grad(self):
+        from scipy.special import erf
+
+        theta = DualNumber(0, [[1.0]])
+        xp = np.linspace(0,10,100) + theta
+        dl_sol = erf(xp)
+        an_deriv = (2 / np.sqrt(np.pi)) * np.exp(- xp.real ** 2)
+        # breakpoint()
+        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
+    
+    def test_log_grad(self):
+        theta = DualNumber(0, [[1.0]])
+        xp = np.linspace(0,10,100) + theta
+        dl_sol = np.log(xp)
+        an_deriv = 1 / xp.real
+        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
+    
+    def text_exp_grad(self):
+        theta = DualNumber(0, [[1.0]])
+        xp = np.linspace(0,10,100) + theta
+        dl_sol = np.exp(xp)
+        an_deriv = dl_sol.real
+        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
 
 def sample_function(x, y):
     return x * np.exp(-(x**2) - y**2)
@@ -369,13 +393,11 @@ class TestInterp:
             - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd - delta])
         ) / (2 * delta)
 
-        assert np.abs(y_test4.dual[0, 0] - dydxl_fd) < 0.01
-        assert np.abs(y_test4.dual[0, 1] - dydxr_fd) < 0.01
-        assert np.abs(y_test4.dual[0, 2] - dydx_fd) < 0.01
-        assert (
-            np.abs(y_test4.real[0] - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]))
-            < 0.01
-        )
+        assert np.allclose(y_test4.dual[0, 0], dydxl_fd, 0.01)
+        assert np.allclose(y_test4.dual[0, 1], dydxr_fd, 0.01)
+        assert np.allclose(y_test4.dual[0, 2], dydx_fd, 0.01)
+        assert np.allclose(y_test4.real[0], np.interp(x_fd, [x1_fd, x2_fd],
+                                                    [y1_fd, y2_fd]), 0.01)
 
     def test_interp_large_array(self):
         theta = DualNumber(1, [[1.0]])
