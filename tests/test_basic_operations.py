@@ -266,15 +266,13 @@ class TestInterp:
             - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd - delta])
         ) / (2 * delta)
 
-        assert np.abs(y_test1.dual[0, 0] - dydxl_fd) < 0.01
-        assert np.abs(y_test1.dual[0, 1] - dydxr_fd) < 0.01
-        assert np.abs(y_test1.dual[0, 2] - dydyl_fd) < 0.01
-        assert np.abs(y_test1.dual[0, 3] - dydyr_fd) < 0.01
-        assert np.abs(y_test1.dual[0, 4] - dydx_fd) < 0.01
-        assert (
-            np.abs(y_test1.real[0] - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]))
-            < 0.01
-        )
+        assert np.allclose(y_test1.dual[0, 0], dydxl_fd, 0.01)
+        assert np.allclose(y_test1.dual[0, 1], dydxr_fd, 0.01)
+        assert np.allclose(y_test1.dual[0, 2], dydyl_fd, 0.01)
+        assert np.allclose(y_test1.dual[0, 3], dydyr_fd, 0.01)
+        assert np.allclose(y_test1.dual[0, 4],  dydx_fd, 0.01)
+        assert np.allclose(y_test1.real[0], np.interp(x_fd, [x1_fd, x2_fd],
+                                                       [y1_fd, y2_fd]), 0.01)
 
     def test_interp_2(self):
         # test set 2: x is not a dual number while xp and yp are dual numbers
@@ -312,14 +310,12 @@ class TestInterp:
             - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd - delta])
         ) / (2 * delta)
 
-        assert np.abs(y_test2.dual[0, 0] - dydxl_fd) < 0.01
-        assert np.abs(y_test2.dual[0, 1] - dydxr_fd) < 0.01
-        assert np.abs(y_test2.dual[0, 2] - dydyl_fd) < 0.01
-        assert np.abs(y_test2.dual[0, 3] - dydyr_fd) < 0.01
-        assert (
-            np.abs(y_test2.real[0] - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]))
-            < 0.01
-        )
+        assert np.allclose(y_test2.dual[0, 0], dydxl_fd, 0.01)
+        assert np.allclose(y_test2.dual[0, 1], dydxr_fd, 0.01)
+        assert np.allclose(y_test2.dual[0, 2], dydyl_fd, 0.01)
+        assert np.allclose(y_test2.dual[0, 3], dydyr_fd, 0.01)
+        assert np.allclose(y_test2.real[0], np.interp(x_fd, [x1_fd, x2_fd],
+                                                       [y1_fd, y2_fd]), 0.01)
 
     def test_interp_3(self):
         # test set 3: xp is not a dual number but x and yp are
@@ -349,13 +345,11 @@ class TestInterp:
             - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd - delta])
         ) / (2 * delta)
 
-        assert np.abs(y_test3.dual[0, 0] - dydyl_fd) < 0.01
-        assert np.abs(y_test3.dual[0, 1] - dydyr_fd) < 0.01
-        assert np.abs(y_test3.dual[0, 2] - dydx_fd) < 0.01
-        assert (
-            np.abs(y_test3.real[0] - np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]))
-            < 0.01
-        )
+        assert np.allclose(y_test3.dual[0, 0], dydyl_fd, 0.01)
+        assert np.allclose(y_test3.dual[0, 1], dydyr_fd, 0.01)
+        assert np.allclose(y_test3.dual[0, 2], dydx_fd, 0.01)
+        assert np.allclose(y_test3.real[0], np.interp(x_fd, [x1_fd, x2_fd],
+                                                       [y1_fd, y2_fd]), 0.01)
 
     def test_interp_4(self):
         # test set 4: yp is not a dual number but x and xp are
