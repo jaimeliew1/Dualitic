@@ -68,6 +68,12 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         else:
             return DualNumber(self.real[index], self.dual[(index, slice(None))])
 
+    def flatten(self, order="C"):
+        real = self.real.flatten(order)
+        dual = np.reshape(self.dual, (*real.shape, -1), order)
+
+        return DualNumber(real, dual)
+
     def __add__(self, other):
         if isinstance(other, DualNumber):
             real = self.real + other.real
@@ -337,7 +343,10 @@ def _(x1, x2):
         x2_real, x2_dual = x2, np.zeros((*x2.shape, degree))
 
     real = x1_real**x2_real
-    dual = real[..., None] * (x1_dual * x2_real[..., None] / x1_real[..., None] + x2_dual * np.log(x1_real[..., None]))
+    dual = real[..., None] * (
+        x1_dual * x2_real[..., None] / x1_real[..., None]
+        + x2_dual * np.log(x1_real[..., None])
+    )
     return DualNumber(real, dual)
 
 
@@ -433,18 +442,22 @@ def _(x, *args, **kwargs):
 @register_dual_ufunc(special.erf)
 def _(x):
     real = special.erf(x.real)
-    return DualNumber(real, (2 * x.dual / np.sqrt(np.pi)) * np.exp(-(x.real[..., None] ** 2)))
+    return DualNumber(
+        real, (2 * x.dual / np.sqrt(np.pi)) * np.exp(-(x.real[..., None] ** 2))
+    )
 
 
 ### Monkey patching
 
-_interp = np.interp
 
 # Monkey patch np.interp
+_interp = np.interp
+
+
 def interp_override(x, xp, yp, *args, **kwargs):
     if not any(isinstance(arg, DualNumber) for arg in [x, xp, yp]):
-        return _interp(x, xp, yp, *args, **kwargs) 
-        
+        return _interp(x, xp, yp, *args, **kwargs)
+
     if isinstance(x, DualNumber):
         x_real = x.real[0]
     else:
@@ -454,11 +467,12 @@ def interp_override(x, xp, yp, *args, **kwargs):
         idx = np.searchsorted(xp.real, x_real) - 1
     else:
         idx = np.searchsorted(xp, x_real) - 1
-    
+
     x_l, x_r = xp[idx], xp[idx + 1]
     y_l, y_r = yp[idx], yp[idx + 1]
 
     return ((y_r - y_l) / (x_r - x_l)) * (x - x_l) + y_l
+
 
 np.interp = interp_override
 
