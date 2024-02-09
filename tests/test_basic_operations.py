@@ -53,6 +53,11 @@ class TestDualScalar:
             np.array([[-1, -1], [-1 / 2, -1 / 2], [-1 / 3, -1 / 3], [-1 / 4, -1 / 4]]),
         )
 
+    def test_flatten(self):
+        a = DualNumber([[1, 2], [3, 4]], [[[1, 1], [2, 2]], [[3, 3], [4, 4]]])
+        a_flat = a.flatten()
+        assert np.array_equal([1,2,3,4], a_flat.real)
+        assert np.array_equal([[1, 1], [2, 2], [3, 3], [4, 4]], a_flat.dual)
 
 class TestDualVec:
     def test_add_scalar(self):
