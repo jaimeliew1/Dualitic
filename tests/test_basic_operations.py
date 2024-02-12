@@ -40,6 +40,55 @@ class TestDualDual:
         assert np.array_equal(out.real, np.array([11, 22]))
         assert np.array_equal(out.dual, np.array([[33, 44, 55], [66, 77, 88]]))
 
+    def test_meshgrid_2x2_dual_dual(self):
+        x = DualNumber([1, 2], [[1, 2], [1, 2]])
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2],
+                                           [1, 2]])
+        assert np.array_equal(xmesh.dual, [[[1, 2], [1, 2]],
+                                           [[1, 2], [1, 2]]])
+        assert np.array_equal(ymesh.real, [[3, 3],
+                                           [4, 4]])
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6]],
+                                           [[7, 8], [7, 8]]])
+        
+    def test_meshgrid_3x2_dual_dual(self):
+        x = DualNumber([1, 2, 3], [[1, 2], [1, 2], [1, 2]])
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2, 3],
+                                           [1, 2, 3]])
+        assert np.array_equal(xmesh.dual, [[[1, 2], [1, 2], [1, 2]],
+                                           [[1, 2], [1, 2], [1, 2]]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3],
+                                           [4, 4, 4]])
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6], [5, 6]],
+                                           [[7, 8], [7, 8], [7, 8]]])
+        
+    def test_meshgrid_3x3_dual_dual(self):
+        x = DualNumber([1, 2, 3], [[1, 2], [1, 2], [1, 2]])
+        y = DualNumber([3, 4, 5], [[5, 6], [7, 8], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2, 3],
+                                           [1, 2, 3],
+                                           [1, 2, 3]])
+        assert np.array_equal(xmesh.dual, [[[1, 2], [1, 2], [1, 2]],
+                                           [[1, 2], [1, 2], [1, 2]],
+                                           [[1, 2], [1, 2], [1, 2]]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3],
+                                           [4, 4, 4],
+                                           [5, 5, 5]])
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6], [5, 6]],
+                                           [[7, 8], [7, 8], [7, 8]],
+                                           [[7, 8], [7, 8], [7, 8]]])
+
 
 class TestDualScalar:
     def test_div_vector(self):
@@ -195,6 +244,87 @@ class TestDualVec:
         an_deriv = dl_sol.real
         assert np.array_equal(dl_sol.dual[:,0], an_deriv)
 
+    def test_meshgrid_2x2_dual_vec(self):
+        x = DualNumber([1,2], [[3, 4], [5, 6]])
+        y = np.array([7, 8])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2],
+                                           [1, 2]])
+        assert np.array_equal(xmesh.dual, [[[3, 4], [5, 6]],
+                                           [[3, 4], [5, 6]]])
+        assert np.array_equal(ymesh, [[7, 7],
+                                      [8, 8]])
+        
+    def test_meshgrid_3x2_dual_vec(self):
+        x = DualNumber([1, 2, 3], [[3, 4], [5, 6], [7, 8]])
+        y = np.array([7, 8])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2, 3],
+                                           [1, 2, 3]])
+        assert np.array_equal(xmesh.dual, [[[3, 4], [5, 6], [7, 8]],
+                                           [[3, 4], [5, 6], [7, 8]]])
+        assert np.array_equal(ymesh, [[7, 7, 7],
+                                      [8, 8, 8]])
+        
+    def test_meshgrid_3x3_dual_vec(self):
+        x = DualNumber([1, 2, 3], [[3, 4], [5, 6], [7, 8]])
+        y = np.array([7, 8, 9])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2, 3],
+                                           [1, 2, 3],
+                                           [1, 2, 3]])
+        assert np.array_equal(xmesh.dual, [[[3, 4], [5, 6], [7, 8]],
+                                           [[3, 4], [5, 6], [7, 8]],
+                                           [[3, 4], [5, 6], [7, 8]]])
+        assert np.array_equal(ymesh, [[7, 7, 7],
+                                      [8, 8, 8],
+                                      [9, 9, 9]])
+        
+    def test_meshgrid_2x2_vec_dual(self):
+        x = [1,2]
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2],
+                                      [1, 2]])
+        assert np.array_equal(ymesh.real, [[3, 3],
+                                           [4, 4]])
+
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6]],
+                                           [[7, 8], [7, 8]]])
+    
+    
+    def test_meshgrid_3x2_vec_dual(self):
+        x = [1, 2, 3]
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2, 3],
+                                      [1, 2, 3]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3],
+                                           [4, 4, 4]])
+
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6], [5, 6]],
+                                           [[7, 8], [7, 8], [7, 8]]])
+
+    def test_meshgrid_3x3_vec_dual(self):
+        x = [1, 2, 3]
+        y = DualNumber([3, 4, 5], [[5, 6], [7, 8], [9, 0]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2, 3],
+                                      [1, 2, 3],
+                                      [1, 2, 3]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3],
+                                           [4, 4, 4],
+                                           [5, 5, 5]])
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6], [5, 6]],
+                                           [[7, 8], [7, 8], [7, 8]],
+                                           [[9, 0], [9, 0], [9, 0]]])
+        
 def sample_function(x, y):
     return x * np.exp(-(x**2) - y**2)
 
