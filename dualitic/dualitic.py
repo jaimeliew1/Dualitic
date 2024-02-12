@@ -55,7 +55,7 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns the degree of the dual number. i.e. the number of dual variables.
         """
-        return len(self.dual[-1])
+        return self.dual.shape[-1]
 
     def __repr__(self):
         return f"DualNumber(degree={self.degree}, {self.real}, {self.dual})"
