@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import special, integrate, interpolate
+from itertools import repeat
 
 REGISTERED_DUAL_UFUNCS = {}
 MONKEY_PATCHED = []
@@ -448,6 +449,47 @@ def _(x):
 
 
 ### Monkey patching
+
+# Monkey patch np.meshgrid
+_meshgrid = np.meshgrid
+
+def meshgrid_override(x: np.ndarray, y: np.ndarray, *args, **kwargs):
+    if not any(isinstance(arg, DualNumber) for arg in [x, y]):
+        return _meshgrid(x, y, *args, **kwargs)
+    
+    if isinstance(x, DualNumber):
+        x_len = len(x.real)
+        x_real = x.real
+    else:
+        x_len = len(x)
+        x_real = x
+
+    if isinstance(y, DualNumber):
+        y_len = len(y.real)
+        y_real = y.real
+    else:
+        y_len = len(y)
+        y_real = y
+    xs_real, ys_real = _meshgrid(x_real, y_real)
+
+    if isinstance(x, DualNumber):
+        x_dual_lg = x.dual[None, ...]
+        concat_tuple = tuple(repeat(x_dual_lg, y_len))
+        xs_dual = np.concatenate(concat_tuple, axis = 0)
+    
+    if isinstance(y, DualNumber):
+        y_dual_lg = y.dual[..., None, :]
+        concat_tuple = tuple(repeat(y_dual_lg, x_len))
+        ys_dual = np.concatenate(concat_tuple, axis = 1)
+
+    if not isinstance(x, DualNumber):
+        return xs_real, DualNumber(ys_real, ys_dual)
+    elif not isinstance(y, DualNumber):
+        return DualNumber(xs_real, xs_dual), ys_real
+    else:
+        return DualNumber(xs_real, xs_dual), DualNumber(ys_real, ys_dual)
+    
+np.meshgrid = meshgrid_override
 
 
 # Monkey patch np.interp
