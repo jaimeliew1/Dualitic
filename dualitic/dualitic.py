@@ -453,10 +453,11 @@ def _(x):
 # Monkey patch np.meshgrid
 _meshgrid = np.meshgrid
 
+
 def meshgrid_override(x: np.ndarray, y: np.ndarray, *args, **kwargs):
     if not any(isinstance(arg, DualNumber) for arg in [x, y]):
         return _meshgrid(x, y, *args, **kwargs)
-    
+
     if isinstance(x, DualNumber):
         x_len = len(x.real)
         x_real = x.real
@@ -475,12 +476,12 @@ def meshgrid_override(x: np.ndarray, y: np.ndarray, *args, **kwargs):
     if isinstance(x, DualNumber):
         x_dual_lg = x.dual[None, ...]
         concat_tuple = tuple(repeat(x_dual_lg, y_len))
-        xs_dual = np.concatenate(concat_tuple, axis = 0)
-    
+        xs_dual = np.concatenate(concat_tuple, axis=0)
+
     if isinstance(y, DualNumber):
         y_dual_lg = y.dual[..., None, :]
         concat_tuple = tuple(repeat(y_dual_lg, x_len))
-        ys_dual = np.concatenate(concat_tuple, axis = 1)
+        ys_dual = np.concatenate(concat_tuple, axis=1)
 
     if not isinstance(x, DualNumber):
         return xs_real, DualNumber(ys_real, ys_dual)
@@ -488,7 +489,8 @@ def meshgrid_override(x: np.ndarray, y: np.ndarray, *args, **kwargs):
         return DualNumber(xs_real, xs_dual), ys_real
     else:
         return DualNumber(xs_real, xs_dual), DualNumber(ys_real, ys_dual)
-    
+
+
 np.meshgrid = meshgrid_override
 
 
