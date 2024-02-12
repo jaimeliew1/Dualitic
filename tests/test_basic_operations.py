@@ -2,7 +2,6 @@ from dualitic import DualNumber
 import numpy as np
 
 
-
 class TestDualDual:
     def test_add_scalar(self):
         a = DualNumber(1, 2)
@@ -40,6 +39,57 @@ class TestDualDual:
         assert np.array_equal(out.real, np.array([11, 22]))
         assert np.array_equal(out.dual, np.array([[33, 44, 55], [66, 77, 88]]))
 
+    def test_meshgrid_2x2_dual_dual(self):
+        x = DualNumber([1, 2], [[1, 2], [1, 2]])
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2], [1, 2]])
+        assert np.array_equal(xmesh.dual, [[[1, 2], [1, 2]], [[1, 2], [1, 2]]])
+        assert np.array_equal(ymesh.real, [[3, 3], [4, 4]])
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6]], [[7, 8], [7, 8]]])
+
+    def test_meshgrid_3x2_dual_dual(self):
+        x = DualNumber([1, 2, 3], [[1, 2], [1, 2], [1, 2]])
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(
+            xmesh.dual, [[[1, 2], [1, 2], [1, 2]], [[1, 2], [1, 2], [1, 2]]]
+        )
+        assert np.array_equal(ymesh.real, [[3, 3, 3], [4, 4, 4]])
+        assert np.array_equal(
+            ymesh.dual, [[[5, 6], [5, 6], [5, 6]], [[7, 8], [7, 8], [7, 8]]]
+        )
+
+    def test_meshgrid_3x3_dual_dual(self):
+        x = DualNumber([1, 2, 3], [[1, 2], [1, 2], [1, 2]])
+        y = DualNumber([3, 4, 5], [[5, 6], [7, 8], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh.real, [[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(
+            xmesh.dual,
+            [
+                [[1, 2], [1, 2], [1, 2]],
+                [[1, 2], [1, 2], [1, 2]],
+                [[1, 2], [1, 2], [1, 2]],
+            ],
+        )
+        assert np.array_equal(ymesh.real, [[3, 3, 3], [4, 4, 4], [5, 5, 5]])
+        assert np.array_equal(
+            ymesh.dual,
+            [
+                [[5, 6], [5, 6], [5, 6]],
+                [[7, 8], [7, 8], [7, 8]],
+                [[7, 8], [7, 8], [7, 8]],
+            ],
+        )
+
 
 class TestDualScalar:
     def test_div_vector(self):
@@ -56,8 +106,9 @@ class TestDualScalar:
     def test_flatten(self):
         a = DualNumber([[1, 2], [3, 4]], [[[1, 1], [2, 2]], [[3, 3], [4, 4]]])
         a_flat = a.flatten()
-        assert np.array_equal([1,2,3,4], a_flat.real)
+        assert np.array_equal([1, 2, 3, 4], a_flat.real)
         assert np.array_equal([[1, 1], [2, 2], [3, 3], [4, 4]], a_flat.dual)
+
 
 class TestDualVec:
     def test_add_scalar(self):
@@ -175,25 +226,100 @@ class TestDualVec:
         from scipy.special import erf
 
         theta = DualNumber(0, [[1.0]])
-        xp = np.linspace(0,10,100) + theta
+        xp = np.linspace(0, 10, 100) + theta
         dl_sol = erf(xp)
-        an_deriv = (2 / np.sqrt(np.pi)) * np.exp(- xp.real ** 2)
+        an_deriv = (2 / np.sqrt(np.pi)) * np.exp(-xp.real**2)
         # breakpoint()
-        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
-    
+        assert np.array_equal(dl_sol.dual[:, 0], an_deriv)
+
     def test_log_grad(self):
         theta = DualNumber(0, [[1.0]])
-        xp = np.linspace(0,10,100) + theta
+        xp = np.linspace(0, 10, 100) + theta
         dl_sol = np.log(xp)
         an_deriv = 1 / xp.real
-        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
-    
+        assert np.array_equal(dl_sol.dual[:, 0], an_deriv)
+
     def text_exp_grad(self):
         theta = DualNumber(0, [[1.0]])
-        xp = np.linspace(0,10,100) + theta
+        xp = np.linspace(0, 10, 100) + theta
         dl_sol = np.exp(xp)
         an_deriv = dl_sol.real
-        assert np.array_equal(dl_sol.dual[:,0], an_deriv)
+        assert np.array_equal(dl_sol.dual[:, 0], an_deriv)
+
+    def test_meshgrid_2x2_dual_vec(self):
+        x = DualNumber([1, 2], [[3, 4], [5, 6]])
+        y = np.array([7, 8])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2], [1, 2]])
+        assert np.array_equal(xmesh.dual, [[[3, 4], [5, 6]], [[3, 4], [5, 6]]])
+        assert np.array_equal(ymesh, [[7, 7], [8, 8]])
+
+    def test_meshgrid_3x2_dual_vec(self):
+        x = DualNumber([1, 2, 3], [[3, 4], [5, 6], [7, 8]])
+        y = np.array([7, 8])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(
+            xmesh.dual, [[[3, 4], [5, 6], [7, 8]], [[3, 4], [5, 6], [7, 8]]]
+        )
+        assert np.array_equal(ymesh, [[7, 7, 7], [8, 8, 8]])
+
+    def test_meshgrid_3x3_dual_vec(self):
+        x = DualNumber([1, 2, 3], [[3, 4], [5, 6], [7, 8]])
+        y = np.array([7, 8, 9])
+        xmesh, ymesh = np.meshgrid(x, y)
+        assert np.array_equal(xmesh.real, [[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(
+            xmesh.dual,
+            [
+                [[3, 4], [5, 6], [7, 8]],
+                [[3, 4], [5, 6], [7, 8]],
+                [[3, 4], [5, 6], [7, 8]],
+            ],
+        )
+        assert np.array_equal(ymesh, [[7, 7, 7], [8, 8, 8], [9, 9, 9]])
+
+    def test_meshgrid_2x2_vec_dual(self):
+        x = [1, 2]
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2], [1, 2]])
+        assert np.array_equal(ymesh.real, [[3, 3], [4, 4]])
+
+        assert np.array_equal(ymesh.dual, [[[5, 6], [5, 6]], [[7, 8], [7, 8]]])
+
+    def test_meshgrid_3x2_vec_dual(self):
+        x = [1, 2, 3]
+        y = DualNumber([3, 4], [[5, 6], [7, 8]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3], [4, 4, 4]])
+
+        assert np.array_equal(
+            ymesh.dual, [[[5, 6], [5, 6], [5, 6]], [[7, 8], [7, 8], [7, 8]]]
+        )
+
+    def test_meshgrid_3x3_vec_dual(self):
+        x = [1, 2, 3]
+        y = DualNumber([3, 4, 5], [[5, 6], [7, 8], [9, 0]])
+
+        xmesh, ymesh = np.meshgrid(x, y)
+
+        assert np.array_equal(xmesh, [[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+        assert np.array_equal(ymesh.real, [[3, 3, 3], [4, 4, 4], [5, 5, 5]])
+        assert np.array_equal(
+            ymesh.dual,
+            [
+                [[5, 6], [5, 6], [5, 6]],
+                [[7, 8], [7, 8], [7, 8]],
+                [[9, 0], [9, 0], [9, 0]],
+            ],
+        )
+
 
 def sample_function(x, y):
     return x * np.exp(-(x**2) - y**2)
@@ -275,9 +401,10 @@ class TestInterp:
         assert np.allclose(y_test1.dual[0, 1], dydxr_fd, 0.01)
         assert np.allclose(y_test1.dual[0, 2], dydyl_fd, 0.01)
         assert np.allclose(y_test1.dual[0, 3], dydyr_fd, 0.01)
-        assert np.allclose(y_test1.dual[0, 4],  dydx_fd, 0.01)
-        assert np.allclose(y_test1.real[0], np.interp(x_fd, [x1_fd, x2_fd],
-                                                       [y1_fd, y2_fd]), 0.01)
+        assert np.allclose(y_test1.dual[0, 4], dydx_fd, 0.01)
+        assert np.allclose(
+            y_test1.real[0], np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]), 0.01
+        )
 
     def test_interp_2(self):
         # test set 2: x is not a dual number while xp and yp are dual numbers
@@ -319,8 +446,9 @@ class TestInterp:
         assert np.allclose(y_test2.dual[0, 1], dydxr_fd, 0.01)
         assert np.allclose(y_test2.dual[0, 2], dydyl_fd, 0.01)
         assert np.allclose(y_test2.dual[0, 3], dydyr_fd, 0.01)
-        assert np.allclose(y_test2.real[0], np.interp(x_fd, [x1_fd, x2_fd],
-                                                       [y1_fd, y2_fd]), 0.01)
+        assert np.allclose(
+            y_test2.real[0], np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]), 0.01
+        )
 
     def test_interp_3(self):
         # test set 3: xp is not a dual number but x and yp are
@@ -353,8 +481,9 @@ class TestInterp:
         assert np.allclose(y_test3.dual[0, 0], dydyl_fd, 0.01)
         assert np.allclose(y_test3.dual[0, 1], dydyr_fd, 0.01)
         assert np.allclose(y_test3.dual[0, 2], dydx_fd, 0.01)
-        assert np.allclose(y_test3.real[0], np.interp(x_fd, [x1_fd, x2_fd],
-                                                       [y1_fd, y2_fd]), 0.01)
+        assert np.allclose(
+            y_test3.real[0], np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]), 0.01
+        )
 
     def test_interp_4(self):
         # test set 4: yp is not a dual number but x and xp are
@@ -395,8 +524,9 @@ class TestInterp:
         assert np.allclose(y_test4.dual[0, 0], dydxl_fd, 0.01)
         assert np.allclose(y_test4.dual[0, 1], dydxr_fd, 0.01)
         assert np.allclose(y_test4.dual[0, 2], dydx_fd, 0.01)
-        assert np.allclose(y_test4.real[0], np.interp(x_fd, [x1_fd, x2_fd],
-                                                    [y1_fd, y2_fd]), 0.01)
+        assert np.allclose(
+            y_test4.real[0], np.interp(x_fd, [x1_fd, x2_fd], [y1_fd, y2_fd]), 0.01
+        )
 
     def test_interp_large_array(self):
         theta = DualNumber(1, [[1.0]])

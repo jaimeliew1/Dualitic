@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import special, integrate, interpolate
+from itertools import repeat
 
 REGISTERED_DUAL_UFUNCS = {}
 MONKEY_PATCHED = []
@@ -54,7 +55,7 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         """
         Returns the degree of the dual number. i.e. the number of dual variables.
         """
-        return len(self.dual[-1])
+        return self.dual.shape[-1]
 
     def __repr__(self):
         return f"DualNumber(degree={self.degree}, {self.real}, {self.dual})"
@@ -448,6 +449,50 @@ def _(x):
 
 
 ### Monkey patching
+
+# Monkey patch np.meshgrid
+_meshgrid = np.meshgrid
+
+
+def meshgrid_override(*xi, indexing="xy", **kwargs):
+    if len(xi) > 2:
+        raise NotImplementedError
+    if indexing != "xy":
+        raise NotImplementedError
+
+    x, y = xi
+    if not any(isinstance(arg, DualNumber) for arg in [x, y]):
+        return _meshgrid(*xi, indexing="xy", **kwargs)
+
+    # Generate real part
+    x_real = x.real if isinstance(x, DualNumber) else x
+    y_real = y.real if isinstance(y, DualNumber) else y
+
+    x_len = len(x_real)
+    y_len = len(y_real)
+
+    xs_real, ys_real = _meshgrid(x_real, y_real)
+
+    # Generate dual part
+    if isinstance(x, DualNumber):
+        x_dual_lg = x.dual[None, ...]
+        xs_dual = np.repeat(x_dual_lg, y_len, axis=0)
+        x_return = DualNumber(xs_real, xs_dual)
+    else:
+        x_return = xs_real
+
+    if isinstance(y, DualNumber):
+        y_dual_lg = y.dual[..., None, :]
+        concat_tuple = tuple(repeat(y_dual_lg, x_len))
+        ys_dual = np.concatenate(concat_tuple, axis=1)
+        y_return = DualNumber(ys_real, ys_dual)
+    else:
+        y_return = ys_real
+
+    return x_return, y_return
+
+
+np.meshgrid = meshgrid_override
 
 
 # Monkey patch np.interp
