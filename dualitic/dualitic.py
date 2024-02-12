@@ -454,41 +454,42 @@ def _(x):
 _meshgrid = np.meshgrid
 
 
-def meshgrid_override(x: np.ndarray, y: np.ndarray, *args, **kwargs):
+def meshgrid_override(*xi, indexing="xy", **kwargs):
+    if len(xi) > 2:
+        raise NotImplementedError
+    if indexing != "xy":
+        raise NotImplementedError
+
+    x, y = xi
     if not any(isinstance(arg, DualNumber) for arg in [x, y]):
-        return _meshgrid(x, y, *args, **kwargs)
+        return _meshgrid(*xi, indexing="xy", **kwargs)
 
-    if isinstance(x, DualNumber):
-        x_len = len(x.real)
-        x_real = x.real
-    else:
-        x_len = len(x)
-        x_real = x
+    # Generate real part
+    x_real = x.real if isinstance(x, DualNumber) else x
+    y_real = y.real if isinstance(y, DualNumber) else y
 
-    if isinstance(y, DualNumber):
-        y_len = len(y.real)
-        y_real = y.real
-    else:
-        y_len = len(y)
-        y_real = y
+    x_len = len(x_real)
+    y_len = len(y_real)
+
     xs_real, ys_real = _meshgrid(x_real, y_real)
 
+    # Generate dual part
     if isinstance(x, DualNumber):
         x_dual_lg = x.dual[None, ...]
-        concat_tuple = tuple(repeat(x_dual_lg, y_len))
-        xs_dual = np.concatenate(concat_tuple, axis=0)
+        xs_dual = np.repeat(x_dual_lg, y_len, axis=0)
+        x_return = DualNumber(xs_real, xs_dual)
+    else:
+        x_return = xs_real
 
     if isinstance(y, DualNumber):
         y_dual_lg = y.dual[..., None, :]
         concat_tuple = tuple(repeat(y_dual_lg, x_len))
         ys_dual = np.concatenate(concat_tuple, axis=1)
-
-    if not isinstance(x, DualNumber):
-        return xs_real, DualNumber(ys_real, ys_dual)
-    elif not isinstance(y, DualNumber):
-        return DualNumber(xs_real, xs_dual), ys_real
+        y_return = DualNumber(ys_real, ys_dual)
     else:
-        return DualNumber(xs_real, xs_dual), DualNumber(ys_real, ys_dual)
+        y_return = ys_real
+
+    return x_return, y_return
 
 
 np.meshgrid = meshgrid_override
