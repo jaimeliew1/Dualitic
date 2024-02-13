@@ -1,6 +1,15 @@
 from dualitic import DualNumber
 import numpy as np
 
+class TestDual:
+    def test_mean(self):
+        a = DualNumber([1,2,3,4],[[1, 0],
+                                  [1, 0],
+                                  [1, 0],
+                                  [1, 0]])
+        a_mean = np.mean(a, axis=0)
+        print(a_mean.real)
+        assert np.array_equal(a_mean.real, [2.5])
 
 class TestDualDual:
     def test_add_scalar(self):

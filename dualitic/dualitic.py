@@ -365,13 +365,13 @@ def _(x, axis=None, **kwargs):
     )
 
 
-@register_dual_ufunc(np.mean)
-def _(x, axis=None, **kwargs):
-    if axis is None:
-        axis = tuple(range(x.real.ndim))
-    return DualNumber(
-        np.mean(x.real, axis=axis, **kwargs), np.mean(x.dual, axis=axis, **kwargs)
-    )
+# @register_dual_ufunc(np.mean)
+# def _(x, axis=None, **kwargs):
+#     if axis is None:
+#         axis = tuple(range(x.real.ndim))
+#     return DualNumber(
+#         np.mean(x.real, axis=axis, **kwargs), np.mean(x.dual, axis=axis, **kwargs)
+#     )
 
 
 @register_dual_ufunc(np.greater_equal)
@@ -449,6 +449,17 @@ def _(x):
 
 
 ### Monkey patching
+
+# Monkey patch np.mean
+_mean = np.mean
+
+def mean_override(x, axis=None, **kwargs):
+    if axis is None:
+        axis = tuple(range(x.real.ndim))
+    return DualNumber(_mean(x.real, axis=axis, **kwargs),
+                      _mean(x.dual, axis=axis, **kwargs))
+
+np.mean = mean_override
 
 # Monkey patch np.meshgrid
 _meshgrid = np.meshgrid
