@@ -12,6 +12,11 @@ class TestVec:
         print(np.sum(a))
         assert np.array_equal([np.sum(a)], [6])
 
+    def test_argsort(self):
+        a = [4,3,2,1]
+        idx_sort = np.argsort(a)
+        assert np.array_equal(idx_sort, [3,2,1,0])
+
 
 class TestDual:
     def test_mean(self):
@@ -40,6 +45,14 @@ class TestDual:
         a_sum = np.sum(a)
         assert np.array_equal(a_sum.real, [10])
         assert np.array_equal(a_sum.dual, [[4, 0]])
+
+    def test_argsort(self):
+        a = DualNumber([4,3,2,1],[[1, 0],
+                                  [1, 0],
+                                  [1, 0],
+                                  [1, 0]])
+        idx_sort = np.argsort(a)
+        assert np.array_equal(idx_sort, [3,2,1,0])
 
 
 class TestDualDual:

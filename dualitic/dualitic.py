@@ -56,6 +56,10 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         Returns the degree of the dual number. i.e. the number of dual variables.
         """
         return self.dual.shape[-1]
+    
+    @property
+    def size(self):
+        return self.real.size
 
     def __repr__(self):
         return f"DualNumber(degree={self.degree}, {self.real}, {self.dual})"
@@ -449,6 +453,18 @@ def _(x):
 
 
 ### Monkey patching
+
+# Monkey patch np.argsort
+_argsort = np.argsort
+
+def argsort_override(a, axis = -1, kind=None, order=None):
+    if not isinstance(a, DualNumber):
+        return _argsort(a, axis = axis, kind = kind, order = order)
+    elif isinstance(a, DualNumber):
+        return _argsort(a.real, axis = axis, kind = kind, order = order)
+        
+
+np.argsort = argsort_override
 
 # Monkey patch np.sum
 _sum = np.sum
