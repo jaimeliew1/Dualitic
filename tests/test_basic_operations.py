@@ -1,6 +1,18 @@
 from dualitic import DualNumber, DualVariables
 import numpy as np
 
+class TestVec:
+    def test_mean(self):
+        a = [1, 2, 3]
+        print(np.mean(a))
+        assert np.array_equal([np.mean(a)], [2.0])
+
+    def test_sum(self):
+        a = [1, 2, 3]
+        print(np.sum(a))
+        assert np.array_equal([np.sum(a)], [6])
+
+
 class TestDual:
     def test_mean(self):
         a = DualNumber([1,2,3,4],[[1, 0],
