@@ -1,4 +1,4 @@
-from dualitic import DualNumber
+from dualitic import DualNumber, DualVariables
 import numpy as np
 
 class TestDual:
@@ -7,9 +7,28 @@ class TestDual:
                                   [1, 0],
                                   [1, 0],
                                   [1, 0]])
-        a_mean = np.mean(a, axis=0)
+        a_mean = np.mean(a)
         print(a_mean.real)
         assert np.array_equal(a_mean.real, [2.5])
+        print(a_mean.dual)
+        assert np.array_equal(a_mean.dual, [[1, 0]])
+
+    def test_mean_list_of_duals(self):
+        a, b, c = DualVariables([1,2,3])
+        list_mean = np.mean([a, b, c])
+        assert np.array_equal(list_mean.real, [2])
+        assert np.array_equal(list_mean.dual, [[1/3, 1/3, 1/3]])
+        assert list_mean.degree == 3
+
+    def test_sum(self):
+        a = DualNumber([1,2,3,4],[[1, 0],
+                                  [1, 0],
+                                  [1, 0],
+                                  [1, 0]])
+        a_sum = np.sum(a)
+        assert np.array_equal(a_sum.real, [10])
+        assert np.array_equal(a_sum.dual, [[4, 0]])
+
 
 class TestDualDual:
     def test_add_scalar(self):

@@ -356,13 +356,13 @@ def _(x):
     return DualNumber(np.log(x.real), x.dual / x.real[..., None])
 
 
-@register_dual_ufunc(np.sum)
-def _(x, axis=None, **kwargs):
-    if axis is None:
-        axis = tuple(range(x.real.ndim))
-    return DualNumber(
-        np.sum(x.real, axis=axis, **kwargs), np.sum(x.dual, axis=axis, **kwargs)
-    )
+# @register_dual_ufunc(np.sum)
+# def _(x, axis=None, **kwargs):
+#     if axis is None:
+#         axis = tuple(range(x.real.ndim))
+#     return DualNumber(
+#         np.sum(x.real, axis=axis, **kwargs), np.sum(x.dual, axis=axis, **kwargs)
+#     )
 
 
 # @register_dual_ufunc(np.mean)
@@ -450,14 +450,32 @@ def _(x):
 
 ### Monkey patching
 
+# Monkey patch np.sum
+_sum = np.sum
+
+def sum_override(x, axis=None, **kwargs):
+    if not isinstance(x, DualNumber):
+        return _sum(x, axis = axis, **kwargs)
+    else:
+        if axis is None:
+            axis = tuple(range(x.real.ndim))
+        return DualNumber(
+            _sum(x.real, axis=axis, **kwargs), _sum(x.dual, axis=axis, **kwargs)
+        )
+
+np.sum = sum_override
+
 # Monkey patch np.mean
 _mean = np.mean
 
 def mean_override(x, axis=None, **kwargs):
-    if axis is None:
-        axis = tuple(range(x.real.ndim))
-    return DualNumber(_mean(x.real, axis=axis, **kwargs),
-                      _mean(x.dual, axis=axis, **kwargs))
+    if not isinstance(x, DualNumber):
+        return _mean(x, axis = axis, **kwargs)
+    else:
+        if axis is None:
+            axis = tuple(range(x.real.ndim))
+        return DualNumber(_mean(x.real, axis=axis, **kwargs),
+                        _mean(x.dual, axis=axis, **kwargs))
 
 np.mean = mean_override
 
