@@ -62,6 +62,9 @@ The derivative is computed automatically through the dual number propagation!
 ``` -->
 
 See the documentation for more examples and API details. Dualitic enables derivative computation with only minor changes to existing code!
+
+## Caveats
+Dualitic can theoretically function with all Numpy and Scipy continuous functions, however not all methods have been implemented. See the [function list](function_list.md) for a comprehensive overview of implemented Numpy and Scipy functions, as well as functions which are not yet implemented.
 <!-- 
 ## Documentation
 
