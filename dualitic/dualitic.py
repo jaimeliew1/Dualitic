@@ -56,7 +56,7 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         Returns the degree of the dual number. i.e. the number of dual variables.
         """
         return self.dual.shape[-1]
-    
+
     @property
     def size(self):
         return self.real.size
@@ -360,24 +360,6 @@ def _(x):
     return DualNumber(np.log(x.real), x.dual / x.real[..., None])
 
 
-# @register_dual_ufunc(np.sum)
-# def _(x, axis=None, **kwargs):
-#     if axis is None:
-#         axis = tuple(range(x.real.ndim))
-#     return DualNumber(
-#         np.sum(x.real, axis=axis, **kwargs), np.sum(x.dual, axis=axis, **kwargs)
-#     )
-
-
-# @register_dual_ufunc(np.mean)
-# def _(x, axis=None, **kwargs):
-#     if axis is None:
-#         axis = tuple(range(x.real.ndim))
-#     return DualNumber(
-#         np.mean(x.real, axis=axis, **kwargs), np.mean(x.dual, axis=axis, **kwargs)
-#     )
-
-
 @register_dual_ufunc(np.greater_equal)
 def _(x1, x2, *args, **kwargs):
     if isinstance(x1, DualNumber):
@@ -457,21 +439,23 @@ def _(x):
 # Monkey patch np.argsort
 _argsort = np.argsort
 
-def argsort_override(a, axis = -1, kind=None, order=None):
+
+def argsort_override(a, axis=-1, kind=None, order=None):
     if not isinstance(a, DualNumber):
-        return _argsort(a, axis = axis, kind = kind, order = order)
+        return _argsort(a, axis=axis, kind=kind, order=order)
     elif isinstance(a, DualNumber):
-        return _argsort(a.real, axis = axis, kind = kind, order = order)
-        
+        return _argsort(a.real, axis=axis, kind=kind, order=order)
+
 
 np.argsort = argsort_override
 
 # Monkey patch np.sum
 _sum = np.sum
 
+
 def sum_override(x, axis=None, **kwargs):
     if not isinstance(x, DualNumber):
-        return _sum(x, axis = axis, **kwargs)
+        return _sum(x, axis=axis, **kwargs)
     else:
         if axis is None:
             axis = tuple(range(x.real.ndim))
@@ -479,19 +463,23 @@ def sum_override(x, axis=None, **kwargs):
             _sum(x.real, axis=axis, **kwargs), _sum(x.dual, axis=axis, **kwargs)
         )
 
+
 np.sum = sum_override
 
 # Monkey patch np.mean
 _mean = np.mean
 
+
 def mean_override(x, axis=None, **kwargs):
     if not isinstance(x, DualNumber):
-        return _mean(x, axis = axis, **kwargs)
+        return _mean(x, axis=axis, **kwargs)
     else:
         if axis is None:
             axis = tuple(range(x.real.ndim))
-        return DualNumber(_mean(x.real, axis=axis, **kwargs),
-                        _mean(x.dual, axis=axis, **kwargs))
+        return DualNumber(
+            _mean(x.real, axis=axis, **kwargs), _mean(x.dual, axis=axis, **kwargs)
+        )
+
 
 np.mean = mean_override
 

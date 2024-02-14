@@ -4,12 +4,10 @@ import numpy as np
 class TestVec:
     def test_mean(self):
         a = [1, 2, 3]
-        print(np.mean(a))
         assert np.array_equal([np.mean(a)], [2.0])
 
     def test_sum(self):
         a = [1, 2, 3]
-        print(np.sum(a))
         assert np.array_equal([np.sum(a)], [6])
 
     def test_argsort(self):
@@ -25,9 +23,7 @@ class TestDual:
                                   [1, 0],
                                   [1, 0]])
         a_mean = np.mean(a)
-        print(a_mean.real)
         assert np.array_equal(a_mean.real, [2.5])
-        print(a_mean.dual)
         assert np.array_equal(a_mean.dual, [[1, 0]])
 
     def test_mean_list_of_duals(self):
