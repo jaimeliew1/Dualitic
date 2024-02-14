@@ -1,6 +1,30 @@
 from dualitic import DualNumber, DualVariables
 import numpy as np
 
+
+class TestArrayCreation:
+    def test_ones_like(self):
+        a_dual_number = DualNumber([1.0], [[2.0, 3.0]])
+        x = np.zeros([1, 2, 3])
+        x_dual = x + a_dual_number
+
+        assert np.array_equal(np.ones_like(x_dual), np.ones_like(x))
+
+    def test_zeros_like(self):
+        a_dual_number = DualNumber([1.0], [[2.0, 3.0]])
+        x = np.zeros([1, 2, 3])
+        x_dual = x + a_dual_number
+
+        assert np.array_equal(np.zeros_like(x_dual), np.zeros_like(x))
+
+    def test_empty_like(self):
+        a_dual_number = DualNumber([1.0], [[2.0, 3.0]])
+        x = np.zeros([1, 2, 3])
+        x_dual = x + a_dual_number
+
+        assert np.array_equal(np.empty_like(x_dual).shape, np.empty_like(x).shape)
+
+
 class TestVec:
     def test_mean(self):
         a = [1, 2, 3]
@@ -11,44 +35,35 @@ class TestVec:
         assert np.array_equal([np.sum(a)], [6])
 
     def test_argsort(self):
-        a = [4,3,2,1]
+        a = [4, 3, 2, 1]
         idx_sort = np.argsort(a)
-        assert np.array_equal(idx_sort, [3,2,1,0])
+        assert np.array_equal(idx_sort, [3, 2, 1, 0])
 
 
 class TestDual:
     def test_mean(self):
-        a = DualNumber([1,2,3,4],[[1, 0],
-                                  [1, 0],
-                                  [1, 0],
-                                  [1, 0]])
+        a = DualNumber([1, 2, 3, 4], [[1, 0], [1, 0], [1, 0], [1, 0]])
         a_mean = np.mean(a)
         assert np.array_equal(a_mean.real, [2.5])
         assert np.array_equal(a_mean.dual, [[1, 0]])
 
     def test_mean_list_of_duals(self):
-        a, b, c = DualVariables([1,2,3])
+        a, b, c = DualVariables([1, 2, 3])
         list_mean = np.mean([a, b, c])
         assert np.array_equal(list_mean.real, [2])
-        assert np.array_equal(list_mean.dual, [[1/3, 1/3, 1/3]])
+        assert np.array_equal(list_mean.dual, [[1 / 3, 1 / 3, 1 / 3]])
         assert list_mean.degree == 3
 
     def test_sum(self):
-        a = DualNumber([1,2,3,4],[[1, 0],
-                                  [1, 0],
-                                  [1, 0],
-                                  [1, 0]])
+        a = DualNumber([1, 2, 3, 4], [[1, 0], [1, 0], [1, 0], [1, 0]])
         a_sum = np.sum(a)
         assert np.array_equal(a_sum.real, [10])
         assert np.array_equal(a_sum.dual, [[4, 0]])
 
     def test_argsort(self):
-        a = DualNumber([4,3,2,1],[[1, 0],
-                                  [1, 0],
-                                  [1, 0],
-                                  [1, 0]])
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
         idx_sort = np.argsort(a)
-        assert np.array_equal(idx_sort, [3,2,1,0])
+        assert np.array_equal(idx_sort, [3, 2, 1, 0])
 
 
 class TestDualDual:

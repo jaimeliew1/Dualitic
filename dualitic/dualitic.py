@@ -436,6 +436,45 @@ def _(x):
 
 ### Monkey patching
 
+# Monkey patch np.zeros_like
+_zeros_like = np.zeros_like
+
+
+def zeros_like_override(a, *args, **kwargs):
+    if not isinstance(a, DualNumber):
+        return _zeros_like(a, *args, **kwargs)
+    elif isinstance(a, DualNumber):
+        return _zeros_like(a.real, *args, **kwargs)
+
+
+np.zeros_like = zeros_like_override
+
+# Monkey patch np.ones_like
+_ones_like = np.ones_like
+
+
+def ones_like_override(a, *args, **kwargs):
+    if not isinstance(a, DualNumber):
+        return _ones_like(a, *args, **kwargs)
+    elif isinstance(a, DualNumber):
+        return _ones_like(a.real, *args, **kwargs)
+
+
+np.ones_like = ones_like_override
+
+# Monkey patch np.empty_like
+_empty_like = np.empty_like
+
+
+def empty_like_override(a, *args, **kwargs):
+    if not isinstance(a, DualNumber):
+        return _empty_like(a, *args, **kwargs)
+    elif isinstance(a, DualNumber):
+        return _empty_like(a.real, *args, **kwargs)
+
+
+np.empty_like = empty_like_override
+
 # Monkey patch np.argsort
 _argsort = np.argsort
 
