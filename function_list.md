@@ -182,8 +182,21 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 
 
 ## Numpy Array creation
-to do
 from https://numpy.org/doc/stable/reference/routines.array-creation.html
+
+| Function                                  | Implementation Status                                        |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| `empty(shape)`                            | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `empty_like(prototype)`                   | ![](https://img.shields.io/badge/Implemented-Yes-green)         |
+| `eye(N)`                                  | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `identity(n)`                             | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `ones(shape)`                             | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `ones_like(a)`                            | ![](https://img.shields.io/badge/Implemented-Yes-green)         |
+| `zeros(shape)`                            | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `zeros_like(a)`                           | ![](https://img.shields.io/badge/Implemented-Yes-green)         |
+| `full(shape, fill_value)`                 | ![](https://img.shields.io/badge/Implemented-N/A-grey)       |
+| `full_like(a, fill_value)`                | ![](https://img.shields.io/badge/Implemented-No-red)         |
+| `meshgrid(*xi[, copy, sparse, indexing])` | ![](https://img.shields.io/badge/Implemented-Partial-yellow) |
 
 
 ## Numpy Array manipulation
