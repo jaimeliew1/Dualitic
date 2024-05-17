@@ -47,8 +47,6 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         self.real = np.atleast_1d(real)
         self.dual = np.atleast_2d(dual)
 
-        if isinstance(self.real[0], DualNumber):
-            breakpoint()
 
     @property
     def degree(self):
