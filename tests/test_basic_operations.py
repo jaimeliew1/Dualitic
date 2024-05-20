@@ -65,6 +65,36 @@ class TestDual:
         idx_sort = np.argsort(a)
         assert np.array_equal(idx_sort, [3, 2, 1, 0])
 
+    def test_set_item1(self):
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
+
+        b = DualNumber([9], [[9, 9]])
+
+        a[1] = b
+
+        assert np.array_equal(a.real, [4, 9, 2, 1])
+        assert np.array_equal(a.dual, [[1, 0], [9, 9], [1, 0], [1, 0]])
+
+    def test_set_item2(self):
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
+
+        b = np.array([9])
+
+        a[1] = b
+
+        assert np.array_equal(a.real, [4, 9, 2, 1])
+        assert np.array_equal(a.dual, [[1, 0], [0, 0], [1, 0], [1, 0]])
+
+    def test_set_item3(self):
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
+
+        b = 9
+
+        a[1] = b
+
+        assert np.array_equal(a.real, [4, 9, 2, 1])
+        assert np.array_equal(a.dual, [[1, 0], [0, 0], [1, 0], [1, 0]])
+
 
 class TestDualDual:
     def test_add_scalar(self):

@@ -47,7 +47,6 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
         self.real = np.atleast_1d(real)
         self.dual = np.atleast_2d(dual)
 
-
     @property
     def degree(self):
         """
@@ -70,6 +69,17 @@ class DualNumber(np.lib.mixins.NDArrayOperatorsMixin):
             return DualNumber(self.real[index], self.dual[(*index, slice(None))])
         else:
             return DualNumber(self.real[index], self.dual[(index, slice(None))])
+
+    def __setitem__(self, index, newvalue):
+        if isinstance(index, tuple):
+            raise NotImplementedError
+        else:
+            if isinstance(newvalue, DualNumber):
+                self.real[index] = newvalue.real
+                self.dual[index] = newvalue.dual
+            else:
+                self.real[index] = newvalue
+                self.dual[index] = 0.0
 
     def flatten(self, order="C"):
         real = self.real.flatten(order)
