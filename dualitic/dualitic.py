@@ -433,6 +433,16 @@ def _(x, *args, **kwargs):
     breakpoint()
     return np.nanmax(x.real, *args, **kwargs)
 
+@register_dual_ufunc(np.not_equal)
+def _(x1, x2, *args, **kwargs):
+    if isinstance(x1, DualNumber):
+        x1 = x1.real
+    
+    if isinstance(x2, DualNumber):
+        x2 = x2.real
+
+    return np.not_equal(x1, x2, *args, **kwargs)
+
 
 @register_dual_ufunc(special.erf)
 def _(x):

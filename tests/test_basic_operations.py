@@ -39,6 +39,11 @@ class TestVec:
         idx_sort = np.argsort(a)
         assert np.array_equal(idx_sort, [3, 2, 1, 0])
 
+    def test_not_equal(self):
+        a = [1, 2, 3, 4]
+        b = [2, 2, 2, 2]
+        mask = np.not_equal(a, b)
+        assert all(mask == [True, False, True, True])
 
 class TestDual:
     def test_mean(self):
