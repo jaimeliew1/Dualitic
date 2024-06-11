@@ -100,6 +100,17 @@ class TestDual:
         assert np.array_equal(a.real, [4, 9, 2, 1])
         assert np.array_equal(a.dual, [[1, 0], [0, 0], [1, 0], [1, 0]])
 
+    def test_not_equal1(self):
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
+        b = DualNumber([3, 3, 5, 6], [[1, 0], [1, 0], [1, 0], [1, 0]])
+        mask = np.not_equal(a, b)
+        assert all(mask == [True, False, True, True])
+
+    def test_not_equal2(self):
+        a = DualNumber([4, 3, 2, 1], [[1, 0], [1, 0], [1, 0], [1, 0]])
+        b = [2, 2, 2, 2]
+        mask = np.not_equal(a, b)
+        assert all(mask == [True, True, False, True])
 
 class TestDualDual:
     def test_add_scalar(self):
