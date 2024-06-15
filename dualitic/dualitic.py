@@ -367,6 +367,26 @@ def _(x1, x2):
 def _(x):
     return DualNumber(np.log(x.real), x.dual / x.real[..., None])
 
+@register_dual_ufunc(np.less)
+def _(x1, x2, *args, **kwargs):
+    if isinstance(x1, DualNumber):
+        x1 = x1.real
+
+    if isinstance(x2, DualNumber):
+        x2 = x2.real
+
+    return np.less(x1, x2, *args, **kwargs)
+
+@register_dual_ufunc(np.greater)
+def _(x1, x2, *args, **kwargs):
+    if isinstance(x1, DualNumber):
+        x1 = x1.real
+
+    if isinstance(x2, DualNumber):
+        x2 = x2.real
+
+    return np.greater(x1, x2, *args, **kwargs)
+
 
 @register_dual_ufunc(np.greater_equal)
 def _(x1, x2, *args, **kwargs):
