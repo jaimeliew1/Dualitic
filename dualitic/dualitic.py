@@ -392,12 +392,20 @@ def _(x, axis=None, **kwargs):
 @register_dual_ufunc(np.maximum)
 def _(a, b, *args, **kwargs):
     assert isinstance(a, DualNumber)
-    assert isinstance(b, float) or isinstance(b, int)
-    indices = np.where(a.real < b)
+    if isinstance(b, DualNumber):
+        b_real = b.real
+        b_dual = b.dual
+    else:
+        b_real = b
+        b_dual = np.zeros(a.dual.shape)
 
-    out = a
-    out.real[indices] = b
-    out.dual[indices] = 0
+    out_real = np.where(a.real > b_real, a.real, b.real)
+
+    dual_indices = np.repeat((a.real > b_real)[..., np.newaxis], a.degree, axis=-1)
+    out_dual = np.where(dual_indices, a.dual, b_dual)
+
+    out = DualNumber(out_real, out_dual)
+
     return out
 
 

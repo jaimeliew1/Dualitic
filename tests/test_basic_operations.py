@@ -633,3 +633,43 @@ class TestInterp:
         y_real = np.interp(x, xp.real, yp.real)
 
         assert np.allclose(y.real, y_real)
+
+    def test_maximum_dual_matrix_dual_matrix(self) -> None:
+        dual = DualNumber([[1.0]], [[[1.0, 2.0]]])
+        A = np.array([[1, 2], [3, 4]]) * dual
+        B = np.array([[2.5, 2.5], [2.5, 2.5]]) * dual
+
+        X = np.maximum(A, B)
+        assert np.array_equal(X.real, [[2.5, 2.5], [3, 4]])
+        assert np.array_equal(
+            X.dual, [[[2.5, 5.0], [2.5, 5.0]], [[3.0, 6.0], [4.0, 8.0]]]
+        )
+
+    def test_maximum_dual_matrix_real_matrix(self) -> None:
+        dual = DualNumber([[1.0]], [[[1.0, 2.0]]])
+        A = np.array([[1, 2], [3, 4]]) * dual
+        B = np.array([[2.5, 2.5], [2.5, 2.5]]) * dual
+
+        X = np.maximum(A, B.real)
+        assert np.array_equal(X.real, [[2.5, 2.5], [3, 4]])
+        assert np.array_equal(
+            X.dual, [[[0.0, 0.0], [0.0, 0.0]], [[3.0, 6.0], [4.0, 8.0]]]
+        )
+
+    def test_maximum_dual_vector_dual_vector(self) -> None:
+        dual = DualNumber([1.0], [[1.0, 2.0]])
+        A = np.array([1, 2, 3, 4]) * dual
+        B = np.array([2.5, 2.5, 2.5, 2.5]) * dual
+
+        X = np.maximum(A, B)
+        assert np.array_equal(X.real, [2.5, 2.5, 3, 4])
+        assert np.array_equal(X.dual, [[2.5, 5.0], [2.5, 5.0], [3.0, 6.0], [4.0, 8.0]])
+
+    def test_maximum_dual_vector_real_vector(self) -> None:
+        dual = DualNumber([1.0], [[1.0, 2.0]])
+        A = np.array([1, 2, 3, 4]) * dual
+        B = np.array([2.5, 2.5, 2.5, 2.5])
+
+        X = np.maximum(A, B)
+        assert np.array_equal(X.real, [2.5, 2.5, 3, 4])
+        assert np.array_equal(X.dual, [[0.0, 0.0], [0.0, 0.0], [3.0, 6.0], [4.0, 8.0]])
