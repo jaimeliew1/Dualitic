@@ -669,22 +669,23 @@ def trapz_override(y, x=None, axis=-1, **kwargs):
 
 np.trapz = trapz_override
 
-# Monkey patch cumtrapz
-_cumtrapz = integrate.cumtrapz
+# Monkey patch cumulative_trapezoid
+_cumulative_trapezoid = integrate.cumulative_trapezoid
 
 
-def cumtrapz_override(x, *args, axis=-1, **kwargs):
+def cumulative_trapezoid_override(x, *args, axis=-1, **kwargs):
     if isinstance(x, DualNumber):
-        real = _cumtrapz(x.real, *args, axis=axis, **kwargs)
+        real = _cumulative_trapezoid(x.real, *args, axis=axis, **kwargs)
         if axis < 0:
             axis -= 1
-        dual = _cumtrapz(x.dual, *args, axis=axis, **kwargs)
+        dual = _cumulative_trapezoid(x.dual, *args, axis=axis, **kwargs)
         return DualNumber(real, dual)
     else:
-        return _cumtrapz(x, *args, axis=axis, **kwargs)
+        return _cumulative_trapezoid(x, *args, axis=axis, **kwargs)
 
 
-integrate.cumtrapz = cumtrapz_override
+integrate.cumulative_trapezoid = cumulative_trapezoid_override
+integrate.cumtrapz = cumulative_trapezoid_override
 
 
 # Monkey patch scipy.interpolate.interp1d
