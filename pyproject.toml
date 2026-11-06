@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "dualitic"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
-authors = ["Jaime Liew <jaimeliew1@gmail.com>"]
+authors = ["Jaime Liew <jaimeliew1@gmail.com>", "Kirby Heck"]
 readme = "README.md"
 packages = [{ include = "dualitic" }]
 
@@ -10,9 +10,6 @@ packages = [{ include = "dualitic" }]
 python = "^3.8"
 numpy = ">=1.16"
 scipy = ">=1.6"
-matplotlib = ">=3.6"
-tqdm = "^4.66.1"
-typing-extensions = "^4.6.3"
 
 
 [tool.poetry.dev-dependencies]
