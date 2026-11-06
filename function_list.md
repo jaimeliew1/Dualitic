@@ -29,7 +29,7 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | ------------ | ------------------------------------------------------------------------------------------------- |
 | `sinh(x)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
 | `cosh(x)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
-| `tanh(x)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
+| `tanh(x)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
 | `arcsinh(x)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
 | `arccosh(x)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
 | `arctanh(x)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red) |
@@ -50,17 +50,18 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | --------------- | ------------------------------------------------------- |
 | `prod(x)`       | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `sum(x)`        | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `mean(x)`       | ![](https://img.shields.io/badge/Implemented-Yes-green) |
 | `nanprod(x)`    | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `nansum(x)`     | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `cumprod(x)`    | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `cumsum(x)`     | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `nancumprod(x)` | ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `nancumsum(x)`  | ![](https://img.shields.io/badge/Implemented-No-red)    |
-| `diff(x)`       | ![](https://img.shields.io/badge/Implemented-No-red)    |
+| `diff(x)`       | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (`prepend`/`append` give a wrong derivative) |
 | `ediff1d(x)`    | ![](https://img.shields.io/badge/Implemented-No-red)    |
-| `gradient(x)`   | ![](https://img.shields.io/badge/Implemented-No-red)    |
+| `gradient(x)`   | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (one spacing per call; several spacings raise) |
 | `cross(x)`      | ![](https://img.shields.io/badge/Implemented-No-red)    |
-| `trapz(x)`      | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `trapz(x)`      | ![](https://img.shields.io/badge/Implemented-Yes-green) (also `trapezoid`, numpy >= 2) |
 ### Exponents and logarithms
 | Function             | Implementation Status                                                                                |
 | -------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -105,9 +106,9 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | `negative(x)`          | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `multiply(x1, x2)`     | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
 | `divide(x1, x2)`       | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
-| `power(x1, x2)`        | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `power(x1, x2)`        | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Partial-yellow) (wrong derivative for an array or dual exponent) |
 | `subtract(x1, x2)`     | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
-| `true_divide(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `true_divide(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Partial-yellow) (the `/` operator is correct; `np.divide` of two dual numbers and in-place `/=` give a wrong derivative) |
 | `floor_divide(x1, x2)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `float_power(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `fmod(x1, x2)`         | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
@@ -128,10 +129,10 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | Function          | Implementation Status                                                                                      |
 | ----------------- | ---------------------------------------------------------------------------------------------------------- |
 | `maximum(x1, x2)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green)       |
-| `max(x)`          | ![](https://img.shields.io/badge/Implemented-No-red)                                                       |
+| `max(x)`          | ![](https://img.shields.io/badge/Implemented-Yes-green) (`keepdims` ignored with `axis=None`; ties take the first maximum) |
 | `amax(x)`         | ![](https://img.shields.io/badge/Implemented-No-red)                                                       |
 | `fmax(x1, x2)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)          |
-| `nanmax(x)`       | ![](https://img.shields.io/badge/Implemented-Yes-green) but for some reason it is registered as a ufunc... |
+| `nanmax(x)`       | ![](https://img.shields.io/badge/Implemented-No-red) (registered as a ufunc, but `nanmax` is not one, so it is never called) |
 | `minimum(x1, x2)` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green)       |
 | `min(x)`          | ![](https://img.shields.io/badge/Implemented-No-red)                                                       |
 | `amin(x)`         | ![](https://img.shields.io/badge/Implemented-No-red)                                                       |
@@ -147,7 +148,7 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | `square(x)`             | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `absolute(x)`           | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) |
 | `fabs(x)`               | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
-| `sign(x)`               | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
+| `sign(x)`               | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (zero derivative) |
 | `heaviside(x1, x2)`     | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)    |
 | `nan_to_num(x)`         | ![](https://img.shields.io/badge/Implemented-No-red)                                                 |
 | `real_if_close(x)`      | ![](https://img.shields.io/badge/Implemented-No-red)                                                 |
@@ -164,18 +165,18 @@ A comprehensive list of Numpy ans Scipy functions which are implemented (and not
 | `invert(x)`            | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 | `left_shift(x1, x2)`   | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 | `right_shift(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `greater(x1, x2)`      | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `greater_equal(x1, x2` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/IImplemented-Yes-green) |
-| `less(x1, x2)`         | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `less_equal(x1, x2)`   | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `not_equal(x1, x2)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `equal(x1, x2)`        | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
+| `greater(x1, x2)`      | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
+| `greater_equal(x1, x2` | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
+| `less(x1, x2)`         | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
+| `less_equal(x1, x2)`   | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
+| `not_equal(x1, x2)`    | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
+| `equal(x1, x2)`        | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (compares the real part) |
 | `logical_and(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 | `logical_or(x1, x2)`   | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 | `logical_xor(x1, x2)`  | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 | `logical_not(x)`       | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `isfinite(x)`          | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
-| `isinf(x)`             | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
+| `isfinite(x)`          | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (real part) |
+| `isinf(x)`             | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green) (real part) |
 | `isnan(x)`             | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-Yes-green)  |
 | `isnat(x)`             | ![](https://img.shields.io/badge/ufunc-blue) ![](https://img.shields.io/badge/Implemented-No-red)     |
 
@@ -200,8 +201,23 @@ from https://numpy.org/doc/stable/reference/routines.array-creation.html
 
 
 ## Numpy Array manipulation
-to do
 from https://numpy.org/doc/stable/reference/routines.array-manipulation.html
+
+| Function                     | Implementation Status |
+| ---------------------------- | --------------------- |
+| `reshape(a, newshape)`       | ![](https://img.shields.io/badge/Implemented-Yes-green) (also the `DualNumber.reshape` method) |
+| `squeeze(a)`                 | ![](https://img.shields.io/badge/Implemented-Yes-green) (also the `DualNumber.squeeze` method) |
+| `expand_dims(a, axis)`       | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `ndarray.flatten()`          | ![](https://img.shields.io/badge/Implemented-Yes-green) (`DualNumber.flatten`; shares memory with the input) |
+| `concatenate(arrays)`        | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `stack(arrays)`              | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `hstack(tup)`                | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `vstack(tup)`                | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `broadcast_arrays(*args)`    | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `pad(array, pad_width)`      | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (`constant_values` is also written into the derivative) |
+| `where(condition, x, y)`     | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `argsort(a)`                 | ![](https://img.shields.io/badge/Implemented-Yes-green) (sorts by the real part) |
+| `ndarray.__setitem__`        | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (an `...` index addresses the derivative axis) |
 
 ## Numpy Fourier Transform
 to do
@@ -259,3 +275,18 @@ from https://numpy.org/doc/stable/reference/routines.linalg.html
 | linalg.inv(a)                      | ![](https://img.shields.io/badge/Implemented-No-red) |
 | linalg.pinv(a[, rcond, hermitian]) | ![](https://img.shields.io/badge/Implemented-No-red) |
 | linalg.tensorinv(a[, ind])         | ![](https://img.shields.io/badge/Implemented-No-red) |
+
+
+## Scipy
+Replaced in the `scipy` modules when `dualitic` is imported, so import `dualitic` before importing these names. Values are dual numbers unless noted. Known wrong results are listed in `tests/bugs.md`.
+
+| Function                                    | Implementation Status |
+| ------------------------------------------- | --------------------- |
+| `integrate.trapezoid(y, x)`                 | ![](https://img.shields.io/badge/Implemented-Yes-green) |
+| `integrate.cumulative_trapezoid(y, x)`      | ![](https://img.shields.io/badge/Implemented-Yes-green) (also `cumtrapz`) |
+| `interpolate.interp1d(x, y)`                | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (dual `y` only; `fill_value` is also written into the derivative) |
+| `interpolate.RectBivariateSpline(x, y, z)`  | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (dual query points; wrong derivative with `grid=True`) |
+| `interpolate.RegularGridInterpolator`       | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (dual query points only, derivative by finite differences) |
+| `interpolate.interpn`                       | ![](https://img.shields.io/badge/Implemented-Yes-green) (dual values or query points; query point derivative by finite differences) |
+| `interpolate.make_interp_spline(x, y)`      | ![](https://img.shields.io/badge/Implemented-Partial-yellow) (dual `y` only; the query point derivative is dropped) |
+| `ndimage.gaussian_filter(input, sigma)`     | ![](https://img.shields.io/badge/Implemented-Yes-green) (dual input or dual `sigma`) |
