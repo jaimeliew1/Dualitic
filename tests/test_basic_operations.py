@@ -8,21 +8,29 @@ class TestArrayCreation:
         x = np.zeros([1, 2, 3])
         x_dual = x + a_dual_number
 
-        assert np.array_equal(np.ones_like(x_dual), np.ones_like(x))
+        out = np.ones_like(x_dual)
+        assert isinstance(out, DualNumber)
+        assert np.array_equal(out.real, np.ones_like(x))
+        assert np.all(out.dual == 0)
 
     def test_zeros_like(self):
         a_dual_number = DualNumber([1.0], [[2.0, 3.0]])
         x = np.zeros([1, 2, 3])
         x_dual = x + a_dual_number
 
-        assert np.array_equal(np.zeros_like(x_dual), np.zeros_like(x))
+        out = np.zeros_like(x_dual)
+        assert isinstance(out, DualNumber)
+        assert np.array_equal(out.real, np.zeros_like(x))
+        assert np.all(out.dual == 0)
 
     def test_empty_like(self):
         a_dual_number = DualNumber([1.0], [[2.0, 3.0]])
         x = np.zeros([1, 2, 3])
         x_dual = x + a_dual_number
 
-        assert np.array_equal(np.empty_like(x_dual).shape, np.empty_like(x).shape)
+        out = np.empty_like(x_dual)
+        assert isinstance(out, DualNumber)
+        assert np.array_equal(out.real.shape, np.empty_like(x).shape)
 
 
 class TestVec:
